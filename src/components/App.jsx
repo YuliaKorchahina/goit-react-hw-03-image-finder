@@ -14,7 +14,6 @@ export class App extends Component {
   };
 
   render() {
-    console.log(this.state);
     const {search} = this.state;
     return (
       <div>

@@ -1,39 +1,40 @@
-// import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
+import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Component } from 'react';
 import { getImages } from 'components/API/getImages';
 
-// import styles from 'styles.module.css';
+import styles from 'styles.module.css';
 
 export class ImageGallery extends Component {
   state = {
-    images: [],
-    loading: false,
-    error: null,
-    page: 1,
+    images: null,
+    // loading: false,
+    // error: null,
+    // page: 1,
   };
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevProps.value !== this.state.value ||
-    prevState.page !== this.state.page) {
-      getImages(this.props.value.trim())
-      .then((response) => response.json())
-        // .then((images) => {
-        //   this.setState({ images });
-        // })
-      
+    const { value } = this.props;
+    if (prevProps.value !== value || prevState.page !== this.state.page) {
+      getImages(value.trim())
+        .then(response => response.json())
+        .then(images => {
+          this.setState({ images });
+        });
     }
   }
 
   render() {
-    // const { images, error, loading } = this.state;
+    const { images } = this.state;
     return (
       <>
-        {/* <ul className={styles.ImageGallery}>
-          {this.state.images &&
-            this.state.images.total.hits.map(el => {
-              return <ImageGalleryItem key={this.state.images.total.hits.id} />;
+        <ul className={styles.ImageGallery}>
+          {images &&
+            images.hits.map(el => {
+              return (
+                <ImageGalleryItem key={el.id} webformatURL={el.webformatURL} />
+              );
             })}
-        </ul> */}
+        </ul>
       </>
     );
   }
