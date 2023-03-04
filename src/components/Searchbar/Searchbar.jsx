@@ -1,6 +1,6 @@
 import { Component } from 'react';
 import styles from 'styles.module.css';
-// import { toast } from 'react-hot-toast';
+import { toast } from 'react-hot-toast';
 
 export class Searchbar extends Component {
   state = {
@@ -14,7 +14,7 @@ export class Searchbar extends Component {
   handleSubmit = e => {
     e.preventDefault();
     if (!this.state.value.trim()) {
-      return alert('Enter correct search query');
+      return toast.error('Enter correct search query')
     }
     this.props.onSearch(this.state.value);
     this.setState({ value: '' });

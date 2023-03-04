@@ -1,11 +1,10 @@
 import styles from 'styles.module.css'
 
-export const Button = (onClick) => {
+export const Button = ({handleLoad}) => {
     return (
-        <button  type="submit" className={styles.Button}>
+        <button   onClick={handleLoad} type="submit" className={styles.Button}>
             <span className="button-label">Load more</span>
           </button>
     )
 }
 
-// onClick={onClick}
