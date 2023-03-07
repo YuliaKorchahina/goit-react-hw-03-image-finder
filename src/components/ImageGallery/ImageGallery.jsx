@@ -1,19 +1,20 @@
 import { ImageGalleryItem } from 'components/ImageGalleryItem/ImageGalleryItem';
 import { Component } from 'react';
 import { getImages } from 'components/API/getImages';
+import { Button } from 'components/Button/Button';
 
 import { Audio } from 'react-loader-spinner';
 import { toast } from 'react-hot-toast';
-
+// import PropTypes from 'prop-types';
 
 import styles from 'styles.module.css';
 
 export class ImageGallery extends Component {
   state = {
-    images: null,
+    images: [],
     loading: false,
     error: null,
-    // page: 1,
+    page: 1,
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -22,9 +23,15 @@ export class ImageGallery extends Component {
       this.setState({ loading: true });
       getImages(value.trim(), this.state.page)
         .then(response => response.json())
-        .then(images => {
-          console.log(images);
-          this.setState({ images });
+        .then(data => {
+          this.setState(({ images }) => ({
+            images: [...images, ...data.hits],
+          }));
+          if (!data.hits.length) {
+            toast.error(
+              `Oooops... No information for your request ${this.props.value}`
+            );
+          }
         })
         .catch(error => {
           this.setState({ error });
@@ -34,17 +41,17 @@ export class ImageGallery extends Component {
   }
 
   handleLoad = () => {
-    this.setState(({page}) => ({
-        page: page + 1
-    }))
-  }
-
+    this.setState(({ page }) => ({
+      page: page + 1,
+    }));
+  };
 
   render() {
     const { images } = this.state;
+    console.log(images);
+    console.log(this.props.value);
     return (
       <>
-      {this.state.error &&  toast.error(`Oooops... No information for your request ${this.props.value}`)}
         {this.state.loading && (
           <Audio
             height="80"
@@ -57,16 +64,19 @@ export class ImageGallery extends Component {
           />
         )}
         <ul className={styles.ImageGallery}>
-          {images &&
-            images.hits.map(el => {
-              return (
-                <ImageGalleryItem key={el.id} webformatURL={el.webformatURL} />
-                
-              );
-            })}
+          {images.map(el => {
+            return (
+              <ImageGalleryItem key={el.id} webformatURL={el.webformatURL} />
+            );
+          })}
         </ul>
-        
+
+        {images.length && <Button onClick={this.handleLoad} />}
       </>
     );
   }
 }
+
+ImageGallery.defaultProps = {
+  images: [],
+};
