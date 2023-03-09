@@ -8,6 +8,7 @@ import { toast } from 'react-hot-toast';
 // import PropTypes from 'prop-types';
 
 import styles from 'styles.module.css';
+import { Modal } from 'components/Modal/Modal';
 
 export class ImageGallery extends Component {
   state = {
@@ -15,6 +16,11 @@ export class ImageGallery extends Component {
     loading: false,
     error: null,
     page: 1,
+    modalOpen: false,
+    modalContent: {
+      largeImageURL: '',
+      tags: '',
+    },
   };
 
   componentDidUpdate(prevProps, prevState) {
@@ -46,12 +52,32 @@ export class ImageGallery extends Component {
     }));
   };
 
+  openModal = (modalContent) => {
+    this.setState({
+      modalOpen: true,
+      modalContent
+    });
+  };
+
+  closeModal = () => {
+    this.setState({
+      modalOpen: false,
+    });
+  };
+
   render() {
-    const { images } = this.state;
-    console.log(images);
-    console.log(this.props.value);
+    
+    const { images, modalOpen, modalContent } = this.state;
+    const { openModal, closeModal } = this;
+
     return (
       <>
+        {modalOpen && (
+          <Modal close={closeModal}>
+            <img src={modalContent.largeImageURL} alt={modalContent.tags}></img>
+          </Modal>
+        )}
+
         {this.state.loading && (
           <Audio
             height="80"
@@ -64,9 +90,13 @@ export class ImageGallery extends Component {
           />
         )}
         <ul className={styles.ImageGallery}>
-          {images.map(el => {
+          {images.map(({ id, webformatURL, largeImageURL, tags }) => {
             return (
-              <ImageGalleryItem key={el.id} webformatURL={el.webformatURL} />
+              <ImageGalleryItem
+                key={id}
+                webformatURL={webformatURL}
+                onClick={() => openModal({ largeImageURL, tags })}
+              />
             );
           })}
         </ul>
