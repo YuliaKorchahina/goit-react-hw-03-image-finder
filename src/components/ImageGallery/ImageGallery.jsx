@@ -25,18 +25,20 @@ export class ImageGallery extends Component {
 
   componentDidUpdate(prevProps, prevState) {
     const { value } = this.props;
+    // const {page} = this.state.page;
+    console.log(value);
+    console.log(prevProps.value);
+    console.log(prevProps.value === value);
     if (prevProps.value !== value || prevState.page !== this.state.page) {
-      this.setState({ loading: true });
+      this.setState({ loading: true, images: [] });
       getImages(value.trim(), this.state.page)
         .then(response => response.json())
         .then(data => {
-          this.setState(({ images }) => ({
-            images: [...images, ...data.hits],
-          }));
+          this.setState({
+            images: [...this.state.images, ...data.hits],
+          });
           if (!data.hits.length) {
-            toast.error(
-              `Oooops... No information for your request ${this.props.value}`
-            );
+            toast.error(`Oooops... No information for your request ${value}`);
           }
         })
         .catch(error => {
@@ -52,10 +54,10 @@ export class ImageGallery extends Component {
     }));
   };
 
-  openModal = (modalContent) => {
+  openModal = modalContent => {
     this.setState({
       modalOpen: true,
-      modalContent
+      modalContent,
     });
   };
 
@@ -66,7 +68,6 @@ export class ImageGallery extends Component {
   };
 
   render() {
-    
     const { images, modalOpen, modalContent } = this.state;
     const { openModal, closeModal } = this;
 

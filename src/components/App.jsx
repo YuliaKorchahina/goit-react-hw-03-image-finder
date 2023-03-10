@@ -15,7 +15,6 @@ export class App extends Component {
     this.setState({ search });
   };
 
- 
   render() {
     const { search } = this.state;
     return (
@@ -28,7 +27,6 @@ export class App extends Component {
         />
         <Searchbar onSearch={this.handleSubmit} />
         <ImageGallery value={search} />
-      
       </div>
     );
   }

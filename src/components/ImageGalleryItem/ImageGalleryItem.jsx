@@ -1,21 +1,16 @@
 // import { Modal } from 'components/Modal/Modal';
 import styles from 'styles.module.css';
 
-export const ImageGalleryItem = ({
-  id,
-  webformatURL,
-  onClick
-}) => {
+export const ImageGalleryItem = ({  webformatURL, onClick, tags }) => {
   return (
     <>
-      <li key={id} onClick={onClick} className={styles.ImageGalleryItem}>
+      <li onClick={onClick} className={styles.ImageGalleryItem}>
         <img
           className={styles.ImageGalleryItem_image}
           src={webformatURL}
-          alt=""
+          alt={tags}
         />
       </li>
-      {/* <Modal largeImageURL={largeImageURL} /> */}
     </>
   );
 };
