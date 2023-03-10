@@ -10,48 +10,57 @@ import { toast } from 'react-hot-toast';
 import styles from 'styles.module.css';
 import { Modal } from 'components/Modal/Modal';
 
+const defaultStateData = {
+  images: [],
+  loading: false,
+  error: null,
+  page: 1,
+  modalOpen: false,
+  modalContent: {
+    largeImageURL: '',
+    tags: '',
+  },
+};
 export class ImageGallery extends Component {
   state = {
-    images: [],
-    loading: false,
-    error: null,
-    page: 1,
-    modalOpen: false,
-    modalContent: {
-      largeImageURL: '',
-      tags: '',
-    },
+    ...defaultStateData,
   };
 
-  componentDidUpdate(prevProps, prevState) {
+  settingState(data, isNewData = true) {
+    this.setState(prevState => ({
+      images: [...(!isNewData ? prevState.images : []), ...data],
+      page: ++prevState.page,
+    }));
+    if (!data.hits.length) {
+      toast.error(
+        `Oooops... No information for your request ${this.props.value}`
+      );
+    }
+  }
+
+  requestImages(value, isNewData, page) {
+    getImages(value.trim(), page)
+      .then(response => response.json())
+      .then(data => {
+        this.settingState(data.hits, isNewData);
+      })
+      .catch(error => {
+        this.setState({ error });
+      })
+      .finally(() => this.setState({ loading: false }));
+  }
+
+  componentDidUpdate(prevProps) {
     const { value } = this.props;
-    // const {page} = this.state.page;
-    console.log(value);
-    console.log(prevProps.value);
-    console.log(prevProps.value === value);
-    if (prevProps.value !== value || prevState.page !== this.state.page) {
-      this.setState({ loading: true, images: [] });
-      getImages(value.trim(), this.state.page)
-        .then(response => response.json())
-        .then(data => {
-          this.setState({
-            images: [...this.state.images, ...data.hits],
-          });
-          if (!data.hits.length) {
-            toast.error(`Oooops... No information for your request ${value}`);
-          }
-        })
-        .catch(error => {
-          this.setState({ error });
-        })
-        .finally(() => this.setState({ loading: false }));
+    if (prevProps.value !== value) {
+      this.setState({ ...defaultStateData });
+      this.requestImages(value, true, defaultStateData.page);
     }
   }
 
   handleLoad = () => {
-    this.setState(({ page }) => ({
-      page: page + 1,
-    }));
+    const { value } = this.props;
+    this.requestImages(value, false, this.state.page);
   };
 
   openModal = modalContent => {
@@ -70,7 +79,6 @@ export class ImageGallery extends Component {
   render() {
     const { images, modalOpen, modalContent } = this.state;
     const { openModal, closeModal } = this;
-
     return (
       <>
         {modalOpen && (
@@ -102,7 +110,7 @@ export class ImageGallery extends Component {
           })}
         </ul>
 
-        {images.length && <Button onClick={this.handleLoad} />}
+        {images.length ? <Button onClick={this.handleLoad} /> : <></>}
       </>
     );
   }
